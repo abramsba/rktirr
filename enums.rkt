@@ -2,6 +2,15 @@
 
 (require ffi/unsafe)
 
+(define driver-type
+  (_enum
+    '(Null = 0
+      Software
+      Burnings
+      Direct3D8
+      Direct3D9
+      OpenGL)))
+
 (define material-flag
   (_enum
     '(Wireframe          = #x1
@@ -54,5 +63,6 @@
       Force_32bit = #x7fffffff)))
 
 (provide
+  driver-type
   material-flag
   material-type)

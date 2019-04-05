@@ -10,7 +10,7 @@
 (define (test)
   (let*
     ([resolution (vec2 #:x 900 #:y 600)]
-     [device (new-device resolution)]
+     [device (new-device #:size resolution #:vsync? #t)]
      [driver (get-video-driver device)]
      [manager (get-scene-manager device)]
      [gui (get-gui-environment device)]
@@ -28,7 +28,7 @@
              (let ([next-x (+ x dir)])
                (set-position camera (vec3 #:x x #:y 10 #:z 10))
                (begin-scene driver #t #t bg-color)
-               (draw-text font "This is a message. Hello, world." 
+               (draw-text font (format "This is a message. Hello, world. FPS: ~a" (get-fps driver)) 
                           (rect 
                             #:p1 (vec2 #:x 0 #:y 0) 
                             #:p2 (vec2 #:x 300 #:y 20))
