@@ -7,8 +7,7 @@
   "pointers.rkt"
   "enums.rkt")
 
-(define _getSceneManager
-  (get-ffi-obj "getSceneManager" libirr
+(define _getSceneManager (get-ffi-obj "getSceneManager" libirr
                (_fun _IrrlichtDevice -> _ISceneManager)))
 (define (get-scene-manager device)
   (_getSceneManager device))
@@ -51,21 +50,38 @@
 
 (define _addBillboard
   (get-ffi-obj "addBillboard" libirr
-               (_fun _ISceneManager -> _ISceneNode)))
-(define (add-billboard manager)
-  (_addBillboard manager))
+               (_fun _ISceneManager _Vec2 _Vec3 -> _ISceneNode)))
+(define (add-billboard manager 
+                       #:size [size (vec2 10 10)] 
+                       #:position [position (vec3 0 0 0)])
+  (_addBillboard manager size position))
+
+(define _addBillboardText
+  (get-ffi-obj "addBillboardText" libirr
+               (_fun _ISceneManager _IGUIFont _string _Vec2 _Vec3 -> _ISceneNode)))
+(define (add-billboard-text manager font text
+                            #:size [size (vec2 10 10)]
+                            #:position [position (vec3 0 0 0)])
+  (_addBillboardText manager font text size position))
 
 (define _addLight
   (get-ffi-obj "addLight" libirr
-               (_fun _ISceneManager -> _ISceneNode)))
-(define (add-light manager)
-  (_addLight manager))
+               (_fun _ISceneManager _Vec3 _Color _float -> _ISceneNode)))
+(define (add-light manager
+                   #:radius [radius 100]
+                   #:color [clr (color 255 255 255)]
+                   #:position [position (vec3 0 0 0)])
+  (_addLight manager position clr radius))
 
 (define _addCube
   (get-ffi-obj "addCube" libirr
-               (_fun _ISceneManager -> _ISceneNode)))
-(define (add-cube manager)
-  (_addCube manager))
+               (_fun _ISceneManager _float _Vec3 _Vec3 _Vec3 -> _ISceneNode)))
+(define (add-cube manager 
+                  #:size [size 1.0] 
+                  #:position [position (vec3 0 0 0)]
+                  #:rotation [rotation (vec3 0 0 0)]
+                  #:scale [scale (vec3 1 1 1)])
+  (_addCube manager (exact->inexact size) position rotation scale))
 
 (define _addOctree
   (get-ffi-obj "addOctree" libirr
@@ -123,7 +139,7 @@
 
 (define _createOctreeSelector
   (get-ffi-obj "createOctreeSelector" libirr
-               (_fun _ISceneManager _IMesh _ISceneNode -> _ITriangleSelector)))
+               (_fun _ISceneManager _IMesh _ISceneNode _int -> _ITriangleSelector)))
 (define (create-octree-selector manager mesh node)
   (_createOctreeSelector manager mesh node))
 
@@ -187,6 +203,18 @@
 (define (get-parent node)
   (_getParent node))
 
+(define _getID
+  (get-ffi-obj "getID" libirr
+               (_fun _ISceneNode -> _int)))
+(define (get-id node)
+  (_getID node))
+
+(define _setID
+  (get-ffi-obj "setID" libirr
+               (_fun _ISceneNode _int -> _void)))
+(define (set-id node id)
+  (_setID node id))
+
 (provide
   get-scene-manager
   draw-scene
@@ -196,6 +224,7 @@
   add-animated-mesh
   add-null
   add-billboard
+  add-billboard-text
   add-light
   add-cube
   add-octree
@@ -216,9 +245,7 @@
   set-active-camera
   set-parent
   add-child
-  get-parent)
-
-
-
-
+  get-parent
+  get-id
+  set-id)
 

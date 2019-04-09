@@ -10,7 +10,9 @@
 (define (test)
   (let*
     ([resolution (vec2 900 600)]
-     [device (new-device #:size resolution #:vsync? #t)]
+     [device (new-device 
+               #:size resolution 
+               #:vsync? #t)]
      [driver (get-video-driver device)]
      [manager (get-scene-manager device)]
      [gui (get-gui-environment device)]
@@ -18,11 +20,15 @@
      [camera (add-camera manager)]
      [crate (get-texture driver "images/crate.jpg")]
      [font (get-default-font gui)]
-     [cube1 (add-cube manager)])
+     [msg (add-billboard-text manager font "Some Random Text Floating Above Box" 
+                              #:position (vec3 0 7 0)
+                              #:size (vec2 20 4))]
+     [cube1 (add-cube manager #:size 5)])
     (set-window-caption device "Hello world example")
     (set-target camera (vec3 0 0 0))
     (set-material-flag cube1 'Lighting #f)
     (set-material-flag cube1 'Bilinear_Filter #f)
+    (set-material-flag msg 'Bilinear_Filter #f)
     (set-material-texture cube1 0 crate)
     (define d (get-active-camera manager))
     (let loop ([x 30][dir -0.05])
