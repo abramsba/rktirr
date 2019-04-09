@@ -75,9 +75,9 @@
 
 (define _addCamera
   (get-ffi-obj "addCamera" libirr
-               (_fun _ISceneManager -> _ISceneNode)))
-(define (add-camera manager)
-  (_addCamera manager))
+               (_fun _ISceneManager _Vec3 _Vec3 _int -> _ISceneNode)))
+(define (add-camera manager #:position [position (vec3 0 0 0)] #:target [target (vec3 0 0 0)] #:active? [active? #t])
+  (_addCamera manager position target (if active? 1 0)))
 
 (define _setTarget
   (get-ffi-obj "setTarget" libirr
@@ -157,6 +157,36 @@
 (define (drop-animator animator)
   (_dropAnimator))
 
+(define _getActiveCamera
+  (get-ffi-obj "getActiveCamera" libirr
+               (_fun _ISceneManager -> _ISceneNode)))
+(define (get-active-camera manager)
+  (_getActiveCamera manager))
+
+(define _setActiveCamera
+  (get-ffi-obj "setActiveCamera" libirr
+               (_fun _ISceneManager _ISceneNode -> _void)))
+(define (set-active-camera manager camera)
+  (_setActiveCamera manager camera))
+
+(define _setParent
+  (get-ffi-obj "setParent" libirr
+               (_fun _ISceneNode _ISceneNode -> _void)))
+(define (set-parent node child)
+  (_setParent node child))
+
+(define _addChild
+  (get-ffi-obj "addChild" libirr
+               (_fun _ISceneNode _ISceneNode -> _void)))
+(define (add-child node child)
+  (_addChild node child))
+
+(define _getParent
+  (get-ffi-obj "getParent" libirr
+               (_fun _ISceneNode -> _ISceneNode)))
+(define (get-parent node)
+  (_getParent node))
+
 (provide
   get-scene-manager
   draw-scene
@@ -181,7 +211,12 @@
   create-straight-animator
   create-circle-animator
   add-animator
-  drop-animator)
+  drop-animator
+  get-active-camera
+  set-active-camera
+  set-parent
+  add-child
+  get-parent)
 
 
 
