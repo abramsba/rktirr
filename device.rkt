@@ -45,10 +45,38 @@
 (define (set-mouse-callback device callback)
   (_setMouseCallback device callback))
 
+(define _getTimer
+  (get-ffi-obj "getTimer" libirr
+               (_fun _IrrlichtDevice -> _ITimer)))
+(define (get-timer device)
+  (_getTimer device))
+
+(define _getTime
+  (get-ffi-obj "getTime" libirr
+               (_fun _ITimer -> _int)))
+(define (get-time timer)
+  (_getTime timer))
+
+(define _startTimer
+  (get-ffi-obj "startTimer" libirr
+               (_fun _ITimer -> _void)))
+(define (start-timer timer)
+  (_startTimer timer))
+
+(define _stopTimer
+  (get-ffi-obj "stopTimer" libirr
+               (_fun _ITimer -> _void)))
+(define (stop-timer timer)
+  (_stopTimer))
+
 (provide
   new-device
   device-running?
   set-window-caption
   set-keyboard-callback
-  set-mouse-callback)
+  set-mouse-callback
+  get-timer
+  get-time
+  start-timer
+  stop-timer)
 

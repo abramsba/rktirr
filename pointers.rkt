@@ -3,6 +3,7 @@
 (require ffi/unsafe)
 
 (define _IrrlichtDevice (_cpointer 'IrrlichtDevice))
+(define _ITimer (_cpointer 'ITimer))
 (define _keyboardEvent (_fun _int _int _int _int _int -> _void))
 (define _mouseEvent (_fun _int _int _float _int _int _int _int _int -> _void))
 
@@ -19,8 +20,16 @@
 (define _IGUIEnvironment (_cpointer 'IGUIEnvironment))
 (define _IGUIFont (_cpointer 'IGUIFont))
 
+(define _btDefaultCollisionConfiguration (_cpointer 'btDefaultCollisionConfiguration))
+(define _btBroadphaseInterface (_cpointer 'btBroadphaseInterface))
+(define _btCollisionDispatcher (_cpointer 'btCollisionDispatcher))
+(define _btSequentialImpulseConstraintSolver (_cpointer 'btSequentialImpulseConstraintSolver))
+(define _btDiscreteDynamicsWorld (_cpointer 'btDiscreteDynamicsWorld))
+(define _btRigidBody (_cpointer 'btRigidBody))
+
 (provide
   _IrrlichtDevice
+  _ITimer
   _keyboardEvent
   _mouseEvent
 
@@ -35,4 +44,11 @@
   _ISceneNodeAnimator
 
   _IGUIEnvironment
-  _IGUIFont)
+  _IGUIFont
+  
+  _btDefaultCollisionConfiguration
+  _btBroadphaseInterface
+  _btCollisionDispatcher
+  _btSequentialImpulseConstraintSolver
+  _btDiscreteDynamicsWorld
+  _btRigidBody)
