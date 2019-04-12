@@ -20,7 +20,7 @@
      [gui (get-gui-environment device)]
      [bg-color (color 50 50 50)]
      [camera (add-camera manager)]
-     [crate (get-texture driver "images/crate.jpg")]
+     [crate (get-texture driver (format "~aimages/crate.jpg" (current-directory)))]
      [font (get-default-font gui)]
      [msg (add-billboard-text manager font "Some Random Text Floating Above Box" 
                               #:position (vec3 0 7 0)
