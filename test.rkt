@@ -38,17 +38,20 @@
      [rigid-bodies (list bt-cube1 bt-cube2 bt-cube3 bt-cube4)]
      [bg-color (color 50 50 50)]
      [running? (lambda () (device-running? device))]
-     [game-loop (lambda (update delta)
-                  (set-window-caption device (format "FPS: ~a, Delta: ~a, Update: ~a" (get-fps video) delta update))
-                  (let physics-loop ([ticks update])
-                    (cond [(> ticks physics-freq)
-                           (let ()
-                            (step-simulation bt-world update)
-                            (physics-loop (- ticks physics-freq)))]))
+     [game-loop (lambda (update delta accum)
+                  (set-window-caption device (format "FPS: ~a, Delta: ~a, Update: ~a, Accumulator: ~a" (get-fps video) delta update accum))
+                  (define acc 
+                    (let physics-loop ([ticks (+ update accum)])
+                      (cond [(> ticks physics-freq)
+                             (let ()
+                              (step-simulation bt-world update)
+                              (physics-loop (- ticks physics-freq)))]
+                            [else ticks])))
                   (for ([b rigid-bodies]) (update-rigid-body b))
                   (begin-scene video #t #t bg-color)
                   (draw-scene scene)
-                  (end-scene video))])
+                  (end-scene video)
+                  acc)])
     (for ([b rigid-bodies]) (add-rigid-body bt-world b))
     (for ([c irr-cubes]) 
          (set-material-texture c 0 tex)
