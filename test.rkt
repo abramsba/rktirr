@@ -6,73 +6,48 @@
   "video.rkt"
   "structures.rkt"
   "gui.rkt"
-  "physics.rkt")
+  "physics.rkt"
+  "loop.rkt")
 
 (define (test)
   (let*
-    ([resolution (vec2 900 600)]
-     [device (new-device 
-               #:size resolution 
-               #:vsync? #t)]
-     [timer (get-timer device)]
-     [driver (get-video-driver device)]
-     [manager (get-scene-manager device)]
-     [gui (get-gui-environment device)]
+    ([res (vec2 900 600)]
+     [device (new-device #:size res)]
+     [video (get-video-driver device)]
+     [scene (get-scene-manager device)]
+     [camera (add-camera scene
+                         #:position (vec3 3 3 3)
+                         #:target (vec3 0 0 0))]
+     [bt-config (new-collision-configuration)]
+     [bt-phase (new-axis-sweep (vec3 -1000 -1000 -1000) (vec3 1000 1000 1000))]
+     [bt-dispatch (new-collision-dispatcher bt-config)]
+     [bt-solver (new-sequential-constraint-solver)]
+     [bt-world (new-dynamics-world bt-dispatch bt-phase bt-solver bt-config)]
+     [irr-cube1 (add-cube scene)]
+     [irr-cube2 (add-cube scene #:position (vec3 0 -3 0))]
+     [irr-cube3 (add-cube scene #:position (vec3 0.5 2 0.5))]
+     [irr-cube4 (add-cube scene #:position (vec3 -0.5 2 -0.5))]
+     [tex (get-texture video (format "~aimages/crate.jpg" (current-directory)))]
+     [bt-cube1 (cube->rigid-body irr-cube1 10.0)]
+     [bt-cube2 (cube->rigid-body irr-cube2)]
+     [bt-cube3 (cube->rigid-body irr-cube3 10.0)]
+     [bt-cube4 (cube->rigid-body irr-cube4 10.0)]
+     [irr-cubes (list irr-cube1 irr-cube2 irr-cube3 irr-cube4)]
+     [rigid-bodies (list bt-cube1 bt-cube2 bt-cube3 bt-cube4)]
      [bg-color (color 50 50 50)]
-     [camera (add-camera manager)]
-     [crate (get-texture driver (format "~aimages/crate.jpg" (current-directory)))]
-     [font (get-default-font gui)]
-     [msg (add-billboard-text manager font "Some Random Text Floating Above Box" 
-                              #:position (vec3 0 7 0)
-                              #:size (vec2 20 4))]
-     [cube1 (add-cube manager 
-                      #:size 1)]
-     [cube2 (add-cube manager 
-                      #:size 1
-                      #:position (vec3 0 -20 0))]
-     [bt-cube1 (cube->rigid-body cube1 10.0)]
-     [bt-cube2 (cube->rigid-body cube2)]
-     [config (new-collision-configuration)]
-     [broadphase (new-axis-sweep (vec3 -1000 -1000 -1000) (vec3 1000 1000 1000))]
-     [dispatcher (new-collision-dispatcher config)]
-     [solver (new-sequential-constraint-solver)]
-     [world (new-dynamics-world dispatcher broadphase solver config)])
-    (set-window-caption device "Hello world example")
-    (set-target camera (vec3 0 0 0))
-    (set-material-flag cube1 'Lighting #f)
-    (set-material-flag cube2 'Lighting #f)
-    (set-material-flag cube1 'Bilinear_Filter #f)
-    (set-material-flag msg 'Bilinear_Filter #f)
-    (set-material-texture cube1 0 crate)
-    (set-material-texture cube2 0 crate)
-    (set-parent cube1 msg)
-    (add-rigid-body world bt-cube1)
-    (add-rigid-body world bt-cube2)
-    (set-position camera (vec3 10 -15 0))
-    (set-target camera (vec3 0 -15 0))
-    (let loop ([x 30]
-               [dir -0.05]
-               [last-time (get-time timer)])
-      (cond [(device-running? device)
-             (let ([next-x (+ x dir)]
-                   [now-time (get-time timer)])
-               (step-simulation world (- now-time last-time))
-               (update-rigid-body bt-cube1)
-               (update-rigid-body bt-cube2)
-               (begin-scene driver #t #t bg-color)
-               (draw-text 
-                 font 
-                 (format "This is a message. Hello, world. FPS: ~a (~a ms)" (get-fps driver) (- now-time last-time))
-                 (rect (vec2 0 0) (vec2 300 20))
-                 (color 255 100 0))
-               (draw-scene manager)
-               (end-scene driver)
-               (sleep 0.016)
-               (loop next-x 
-                     (cond 
-                       [(<= next-x -30) 0.05]
-                       [(>= next-x 30) -0.05]
-                       [else dir])
-                     now-time))]))))
+     [running? (lambda () (device-running? device))]
+     [game-loop (lambda (update delta)
+                  (set-window-caption device (format "FPS: ~a, Delta: ~a, Update: ~a" (get-fps video) delta update))
+                  (step-simulation bt-world (exact-round delta))
+                  (for ([b rigid-bodies]) (update-rigid-body b))
+                  (begin-scene video #t #t bg-color)
+                  (draw-scene scene)
+                  (end-scene video))])
+    (for ([b rigid-bodies]) (add-rigid-body bt-world b))
+    (for ([c irr-cubes]) 
+         (set-material-texture c 0 tex)
+         (set-material-flag c 'Bilinear_Filter #f)
+         (set-material-flag c 'Lighting #f))
+    (loop game-loop running? 60)))
 
 (module+ main (test))

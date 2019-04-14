@@ -11,7 +11,7 @@
 (define _ITexture (_cpointer 'ITexture))
 
 (define _ISceneManager (_cpointer 'ISceneManager))
-(define _ISceneNode (_cpointer 'ISceneNode))
+(define _ISceneNode (_cpointer/null 'ISceneNode))
 (define _IMesh (_cpointer 'IMesh))
 (define _IAnimatedMesh (_cpointer 'IAnimatedMesh))
 (define _ITriangleSelector (_cpointer 'ITriangleSelector))
