@@ -9,6 +9,8 @@
   "physics.rkt"
   "loop.rkt")
 
+(define physics-freq (/ 1000 60))
+
 (define (test)
   (let*
     ([res (vec2 900 600)]
@@ -38,7 +40,11 @@
      [running? (lambda () (device-running? device))]
      [game-loop (lambda (update delta)
                   (set-window-caption device (format "FPS: ~a, Delta: ~a, Update: ~a" (get-fps video) delta update))
-                  (step-simulation bt-world (exact-round delta))
+                  (let physics-loop ([ticks update])
+                    (cond [(> ticks physics-freq)
+                           (let ()
+                            (step-simulation bt-world update)
+                            (physics-loop (- ticks physics-freq)))]))
                   (for ([b rigid-bodies]) (update-rigid-body b))
                   (begin-scene video #t #t bg-color)
                   (draw-scene scene)
@@ -48,6 +54,6 @@
          (set-material-texture c 0 tex)
          (set-material-flag c 'Bilinear_Filter #f)
          (set-material-flag c 'Lighting #f))
-    (loop game-loop running? 60)))
+    (loop game-loop running? 30)))
 
 (module+ main (test))

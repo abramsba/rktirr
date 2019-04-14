@@ -6,7 +6,9 @@
      [update-time (- now-time prev-time)]
      [delta-time (/ update-time (/ 1000 fps))]
      [sleep-time (/ (+ (- now-time (current-milliseconds)) (/ 1000 fps)) 1000)])
-    (game update-time delta-time)
+    (game 
+      (exact->inexact update-time) 
+      (exact->inexact delta-time))
     (sleep sleep-time)
     (cond [(check?) (loop game check? fps now-time)])))
 

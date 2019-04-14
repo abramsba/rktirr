@@ -38,7 +38,7 @@
 
 (define _stepSimulation
   (get-ffi-obj "stepSimulation" libirr
-               (_fun _btDiscreteDynamicsWorld _int -> _void)))
+               (_fun _btDiscreteDynamicsWorld _float -> _void)))
 (define (step-simulation world delta)
   (_stepSimulation world delta))
 
